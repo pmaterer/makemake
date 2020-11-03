@@ -1,114 +1,97 @@
-package services
+package services_test
 
 import (
 	"testing"
 
-	"github.com/pmaterer/makemake/domain"
-	"github.com/pmaterer/makemake/domain/mocks"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"github.com/pmaterer/makemake/mocks"
+	"github.com/pmaterer/makemake/services"
 )
 
+var bookRepo *mocks.Repo
+var service services.BookService
+
+func init() {
+	bookRepo = mocks.NewMockBookRepo()
+	service = services.CreateBookService(bookRepo)
+}
+
 func TestAddBook(t *testing.T) {
-	mockBookRepo := new(mocks.BookRepository)
-	mockBook := domain.Book{
-		ID:     1,
-		Title:  "The Stand",
-		Author: "Stephen King",
-		ISBN:   "12345678",
+
+	bookRepo.ShouldErr = false
+	err := service.AddBook(bookRepo.Books[0])
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	t.Run("success", func(t *testing.T) {
-		mockBookRepo.On("AddBook", mock.Anything).Return(nil).Once()
-		s := CreateBookService(mockBookRepo)
-		err := s.AddBook(mockBook)
-
-		assert.NoError(t, err)
-
-		mockBookRepo.AssertExpectations(t)
-	})
+	bookRepo.ShouldErr = true
+	err = service.AddBook(bookRepo.Books[0])
+	if err == nil {
+		t.Fatal(err)
+	}
 }
 
 func TestDeleteBook(t *testing.T) {
-	mockBookRepo := new(mocks.BookRepository)
-	mockBook := domain.Book{
-		ID:     1,
-		Title:  "The Stand",
-		Author: "Stephen King",
-		ISBN:   "12345678",
+
+	bookRepo.ShouldErr = false
+	err := service.DeleteBook(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bookRepo.ShouldErr = true
+	err = service.DeleteBook(0)
+	if err == nil {
+		t.Fatal(err)
 	}
 
-	t.Run("success", func(t *testing.T) {
-		mockBookRepo.On("DeleteBook", mock.AnythingOfType("int")).Return(nil).Once()
-		s := CreateBookService(mockBookRepo)
-		err := s.DeleteBook(mockBook.ID)
-
-		assert.NoError(t, err)
-
-		mockBookRepo.AssertExpectations(t)
-	})
-}
-
-func TestGetBook(t *testing.T) {
-	mockBookRepo := new(mocks.BookRepository)
-	mockBook := domain.Book{
-		ID:     1,
-		Title:  "The Stand",
-		Author: "Stephen King",
-		ISBN:   "12345678",
-	}
-
-	t.Run("success", func(t *testing.T) {
-		mockBookRepo.On("GetBook", mock.AnythingOfType("int")).Return(mockBook, nil).Once()
-		s := CreateBookService(mockBookRepo)
-		b, err := s.GetBook(mockBook.ID)
-
-		assert.NoError(t, err)
-		assert.NotNil(t, b)
-
-		mockBookRepo.AssertExpectations(t)
-	})
 }
 
 func TestGetAllBooks(t *testing.T) {
-	mockBookRepo := new(mocks.BookRepository)
-	mockBook := domain.Book{
-		ID:     1,
-		Title:  "The Stand",
-		Author: "Stephen King",
-		ISBN:   "12345678",
+
+	bookRepo.ShouldErr = false
+	b, err := service.GetAllBooks()
+	if err != nil {
+		t.Fatal(err)
 	}
-	mockBooks := make([]domain.Book, 0)
-	mockBooks = append(mockBooks, mockBook)
+	if len(b) != 2 {
+		t.Fatalf("Expected returned list to be of size 2, got: %d", len(b))
+	}
 
-	t.Run("success", func(t *testing.T) {
-		mockBookRepo.On("GetAllBooks").Return(mockBooks, nil).Once()
-		s := CreateBookService(mockBookRepo)
-		b, err := s.GetAllBooks()
+	bookRepo.ShouldErr = true
+	_, err = service.GetAllBooks()
+	if err == nil {
+		t.Fatal(err)
+	}
+}
 
-		assert.NoError(t, err)
-		assert.NotNil(t, b)
+func TestGetBook(t *testing.T) {
 
-		mockBookRepo.AssertExpectations(t)
-	})
+	bookRepo.ShouldErr = false
+	b, err := service.GetBook(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if b.Author != "Stephen King" {
+		t.Fatalf("Unexpected book author returned. Got: %s, wanted: %s", b.Title, "Stephen King")
+	}
+
+	bookRepo.ShouldErr = true
+	_, err = service.GetBook(0)
+	if err == nil {
+		t.Fatal(err)
+	}
 }
 
 func TestUpdateBook(t *testing.T) {
-	mockBookRepo := new(mocks.BookRepository)
-	mockBook := domain.Book{
-		ID:     1,
-		Title:  "The Stand",
-		Author: "Stephen King",
-		ISBN:   "12345678",
+
+	bookRepo.ShouldErr = false
+	err := service.UpdateBook(bookRepo.Books[0])
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	t.Run("success", func(t *testing.T) {
-		mockBookRepo.On("UpdateBook", mock.Anything).Return(nil).Once()
-		s := CreateBookService(mockBookRepo)
-		err := s.UpdateBook(mockBook)
-
-		assert.NoError(t, err)
-
-		mockBookRepo.AssertExpectations(t)
-	})
+	bookRepo.ShouldErr = true
+	err = service.UpdateBook(bookRepo.Books[0])
+	if err == nil {
+		t.Fatal(err)
+	}
 }

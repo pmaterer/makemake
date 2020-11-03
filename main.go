@@ -8,8 +8,8 @@ import (
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
-	"github.com/pmaterer/makemake/handlers"
-	"github.com/pmaterer/makemake/repository"
+	"github.com/pmaterer/makemake/interfaces/handlers"
+	"github.com/pmaterer/makemake/interfaces/repository"
 	"github.com/pmaterer/makemake/services"
 )
 

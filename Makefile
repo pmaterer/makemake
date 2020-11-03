@@ -1,3 +1,6 @@
+test:
+	go test -v ./...
+
 build:
 	docker-compose build makemake
 

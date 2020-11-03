@@ -39,6 +39,7 @@ func (h bookHandler) AddBook(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	respondWithJSON(w, http.StatusCreated, "Created book")
 }
 
 func (h bookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
@@ -50,6 +51,7 @@ func (h bookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	respondWithJSON(w, http.StatusOK, "Deleted book")
 }
 
 func (h bookHandler) GetAllBooks(w http.ResponseWriter, r *http.Request) {
@@ -87,4 +89,5 @@ func (h bookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	respondWithJSON(w, http.StatusOK, "Book updated")
 }
